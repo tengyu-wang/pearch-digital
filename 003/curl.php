@@ -33,27 +33,35 @@
  * )
  */
 
+// read data from an Ajax post request
 $data = trim(file_get_contents('php://input'));
 
 if ($data) {
     $data = json_decode($data, true);
+    // add 'time' for the event fired
     $data['time'] = date('H:i:s, jS F, Y');
+
+    // remote endpoint, in this test case, code on it just simply to catch the GET and POST
     $url = "http://dev.test06/index.php";
     $header = array("Content-Type: application/x-www-form-urlencoded");
+
+    // use CURL to send a POST request to analytics system - a remote endpoint
     $curl = curl_init();
 
+    // if failed to initialise CURL
     if ($curl === false) {
         echo json_encode(['success' => false]);
         exit();
     }
 
-    curl_setopt($curl, CURLOPT_URL, $url);
-    curl_setopt($curl, CURLOPT_HTTPHEADER, $header);
-    curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-    curl_setopt($curl, CURLOPT_POST, 1);
-    curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
+    curl_setopt($curl, CURLOPT_URL, $url); // set endpoint
+    curl_setopt($curl, CURLOPT_HTTPHEADER, $header); // set header
+    curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1); // set if return the transfer as a string of response
+    curl_setopt($curl, CURLOPT_POST, 1); // set request method
+    curl_setopt($curl, CURLOPT_POSTFIELDS, $data); // set data sent for this post request
     $response = curl_exec($curl);
 
+    // if failed to send request
     if ($response === false) {
         echo json_encode(['success' => false]);
         exit();
@@ -62,4 +70,5 @@ if ($data) {
     curl_close($curl);
 }
 
+// tracking data successfully
 echo json_encode(['success' => true]);
